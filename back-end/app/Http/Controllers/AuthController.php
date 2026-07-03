@@ -5,58 +5,100 @@ namespace App\Http\Controllers;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\QueryException;
+use Exception;
 
 class AuthController extends Controller
 {
-    public function __construct(private readonly AuthService $authService)
-    {
-    }
+    public function __construct(private readonly AuthService $authService) {}
 
     public function register(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
-            'phone' => ['nullable', 'string', 'max:30'],
-            'address' => ['nullable', 'string', 'max:1000'],
-        ]);
+        try {
+            $data = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+                'password' => ['required', 'string', 'min:8'],
+                'phone' => ['nullable', 'string', 'max:30'],
+                'address' => ['nullable', 'string', 'max:1000'],
+            ]);
 
-        $result = $this->authService->registerCustomer($data);
+            $result = $this->authService->registerCustomer($data);
 
-        return response()->json([
-            'message' => 'Customer registered successfully.',
-            'user' => $result['user'],
-            'token' => $result['token'],
-        ], 201);
+            return response()->json([
+                'message' => 'Customer registered successfully.',
+                'user' => $result
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (QueryException $e) {
+            return response()->json([
+                'message' => 'Database error occurred.',
+                'error' => $e->getMessage(),
+            ], 500);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'An unexpected error occurred.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function login(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
+        try {
+            $data = $request->validate([
+                'email' => ['required', 'email'],
+                'password' => ['required', 'string'],
+            ]);
 
-        $result = $this->authService->login($data['email'], $data['password']);
+            $result = $this->authService->login($data['email'], $data['password']);
 
-        return response()->json([
-            'message' => 'Logged in successfully.',
-            'user' => $result['user'],
-            'token' => $result['token'],
-        ]);
+            return response()->json([
+                'message' => 'Logged in successfully.',
+                'user' => $result['user'],
+                'token' => $result['token'],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage() ?: 'Login failed.',
+                'error' => $e->getMessage(),
+            ], 401);
+        }
     }
 
     public function me(Request $request): JsonResponse
     {
-        return response()->json(['user' => $request->user()]);
+        try {
+            return response()->json(['user' => $request->user()]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch user.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function logout(Request $request): JsonResponse
     {
-        $this->authService->logout($request->user());
+        try {
+            $this->authService->logout($request->user());
 
-        return response()->json(['message' => 'Logged out successfully.']);
+            return response()->json(['message' => 'Logged out successfully.']);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Logout failed.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
-
 }

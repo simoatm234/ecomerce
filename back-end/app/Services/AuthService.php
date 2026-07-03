@@ -8,24 +8,25 @@ use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-    public function registerCustomer(array $data): array
+    public function registerCustomer(array $data): User
     {
         $data['role'] = 'customer';
+        $data['password'] = Hash::make($data['password']); 
 
-        return $this->createUser($data, 'customer-auth-token');
+        return $this->createUser($data);
     }
 
     public function login(string $email, string $password): array
     {
         $user = User::where('email', $email)->first();
 
-        if (! $user || ! Hash::check($password, $user->password)) {
+        if (!$user || !Hash::check($password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
-        return $this->issueToken($user, $user->role.'-auth-token');
+        return $this->issueToken($user, $user->role . '-auth-token');
     }
 
     public function logout(User $user): void
@@ -33,9 +34,9 @@ class AuthService
         $user->currentAccessToken()?->delete();
     }
 
-    private function createUser(array $data, string $tokenName): array
+    private function createUser(array $data): User
     {
-        $user = User::create([
+        return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $data['password'],
@@ -43,8 +44,6 @@ class AuthService
             'phone' => $data['phone'] ?? null,
             'address' => $data['address'] ?? null,
         ]);
-
-        return $this->issueToken($user, $tokenName);
     }
 
     private function issueToken(User $user, string $tokenName): array
