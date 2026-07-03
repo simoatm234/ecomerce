@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './app/router/router';
-import { api } from './app/lib/Api';
-import axios from 'axios';
+import AuthInitializer from './AuthInitializer';
 
 export default function App() {
-  
   return (
     <div>
-      <RouterProvider router={router} />
+      <AuthInitializer>
+        <RouterProvider router={router} />
+      </AuthInitializer>
     </div>
   );
 }

@@ -8,12 +8,14 @@ use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-    public function registerCustomer(array $data): User
+    public function registerCustomer(array $data): array
     {
         $data['role'] = 'customer';
-        $data['password'] = Hash::make($data['password']); 
+        $data['password'] = Hash::make($data['password']);
 
-        return $this->createUser($data);
+        $user = $this->createUser($data);
+
+        return $this->issueToken($user, $user->role . '-auth-token');
     }
 
     public function login(string $email, string $password): array
@@ -50,7 +52,11 @@ class AuthService
     {
         return [
             'user' => $user->fresh(),
-            'token' => $user->createToken($tokenName)->plainTextToken,
+            'token' => $user->createToken(
+                $tokenName,
+                ['*'],
+                now()->addMinutes(config('sanctum.expiration'))
+            )->plainTextToken,
         ];
     }
 }

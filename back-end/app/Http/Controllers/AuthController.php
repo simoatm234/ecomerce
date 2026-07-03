@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,22 +15,17 @@ class AuthController extends Controller
 {
     public function __construct(private readonly AuthService $authService) {}
 
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
         try {
-            $data = $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-                'password' => ['required', 'string', 'min:8'],
-                'phone' => ['nullable', 'string', 'max:30'],
-                'address' => ['nullable', 'string', 'max:1000'],
-            ]);
+            $data = $request->validated();
 
             $result = $this->authService->registerCustomer($data);
 
             return response()->json([
                 'message' => 'Customer registered successfully.',
-                'user' => $result
+                'user' => $result['user'],
+                'token' => $result['token'],
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
@@ -36,25 +33,22 @@ class AuthController extends Controller
                 'errors' => $e->errors(),
             ], 422);
         } catch (QueryException $e) {
+            \Log::error($e->getMessage());
             return response()->json([
                 'message' => 'Database error occurred.',
-                'error' => $e->getMessage(),
             ], 500);
         } catch (Exception $e) {
+            \Log::error($e->getMessage());
             return response()->json([
                 'message' => 'An unexpected error occurred.',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
 
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
         try {
-            $data = $request->validate([
-                'email' => ['required', 'email'],
-                'password' => ['required', 'string'],
-            ]);
+            $data = $request->validated();
 
             $result = $this->authService->login($data['email'], $data['password']);
 

@@ -57,12 +57,10 @@ export default function AuthPage() {
     },
   });
 
-  // Register form
   const {
     register: registerField,
     handleSubmit: handleRegisterSubmit,
     formState: { errors: registerErrors },
-    reset: resetRegister,
   } = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -103,14 +101,18 @@ export default function AuthPage() {
           address: data.address || null,
         })
       ).unwrap();
-      console.log(result);
-      resetRegister();
-      setActiveTab('login');
+
+      const role = result?.user?.role?.toLowerCase();
+
+      if (role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/user/dashboard');
+      }
     } catch (error) {
       console.error(error);
     }
   };
-
   // Switch tab and clear errors
   const switchTab = (tab) => {
     setActiveTab(tab);
