@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { login, register } from '../../app/services/thunkFunctions/AuthThunk';
 import { useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod/dist/zod.mjs';
+import { api } from '../../app/lib/Api';
 
 // Login validation schema
 const loginSchema = z.object({
@@ -85,6 +86,15 @@ export default function AuthPage() {
       } else {
         navigate('/user/dashboard');
       }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const response = await api.auth.googleAuth();
+      window.location.href = response.data.url;
     } catch (error) {
       console.error(error);
     }
@@ -205,7 +215,10 @@ export default function AuthPage() {
 
           {/* Social Logins */}
           <div className="space-y-3 mb-8">
-            <button className="w-full flex items-center justify-center gap-2 py-3 px-6 border border-[#CBC4D2] rounded-lg hover:bg-[#F8F2FA] transition-colors text-sm font-medium">
+            <button
+              className="w-full flex items-center justify-center gap-2 py-3 px-6 border border-[#CBC4D2] rounded-lg hover:bg-[#F8F2FA] transition-colors text-sm font-medium"
+              onClick={handleGoogleLogin}
+            >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"

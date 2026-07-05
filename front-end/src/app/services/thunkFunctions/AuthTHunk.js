@@ -16,14 +16,42 @@ export const login = createAsyncThunk(
 );
 
 export const register = createAsyncThunk(
-  'auth/register', // ✅ Fixed: was 'auth/login'
+  'auth/register',
   async (data, { rejectWithValue }) => {
     try {
       const res = await api.auth.register(data);
       return res.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'An error occurred during registration' // ✅ Fixed message too
+        error.response?.data?.message || 'An error occurred during registration'
+      );
+    }
+  }
+);
+
+export const forgotPasswordThunk = createAsyncThunk(
+  'auth/forgotPassword',
+  async (email, { rejectWithValue }) => {
+    try {
+      const response = await api.auth.forgotPasswordApi(email);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to send reset link.'
+      );
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  'auth/resetPassword',
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await api.auth.resetPassword(data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to reset password.'
       );
     }
   }

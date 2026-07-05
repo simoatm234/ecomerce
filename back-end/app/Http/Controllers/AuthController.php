@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Exception;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -67,6 +70,83 @@ class AuthController extends Controller
                 'message' => $e->getMessage() ?: 'Login failed.',
                 'error' => $e->getMessage(),
             ], 401);
+        }
+    }
+    public function redirectToGoogle(): JsonResponse
+    {
+        try {
+            $url = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
+
+            return response()->json(['url' => $url]);
+        } catch (Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Unable to connect to Google.',
+            ], 500);
+        }
+    }
+
+    public function handleGoogleCallback(): \Illuminate\Http\RedirectResponse
+    {
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
+
+            $result = $this->authService->loginWithGoogle(
+                $googleUser->getId(),
+                $googleUser->getName(),
+                $googleUser->getEmail()
+            );
+
+            return redirect()->away(
+                $frontendUrl . '/auth/google/callback?token=' . $result['token'] . '&role=' . $result['user']->role
+            );
+        } catch (Exception $e) {
+            \Log::error($e->getMessage());
+            return redirect()->away($frontendUrl . '/auth?error=google_failed');
+        }
+    }
+
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        try {
+            $this->authService->sendResetLink($request->validated()['email']);
+
+            return response()->json([
+                'message' => 'Password reset link sent to your email.',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Unable to send reset link.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Something went wrong. Please try again.',
+            ], 500);
+        }
+    }
+
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+        try {
+            $this->authService->resetPassword($request->validated());
+
+            return response()->json([
+                'message' => 'Password reset successfully. You can now log in.',
+            ] );
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Unable to reset password.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Something went wrong. Please try again.',
+            ], 500);
         }
     }
 

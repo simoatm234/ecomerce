@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Mail\ResetPasswordMail;
+use Illuminate\Support\Facades\Mail;
 
 class User extends Authenticatable
 {
@@ -23,6 +25,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'google_id',
         'password',
         'role',
         'phone',
@@ -51,7 +54,19 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    // methods
+   
 
+    public function sendPasswordResetNotification($token): void
+    {
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        $resetUrl = $frontendUrl . '/auth/reset-password?token=' . $token . '&email=' . urlencode($this->email);
+
+        Mail::to($this->email)->send(new ResetPasswordMail($this->name, $resetUrl));
+    }
+
+
+    // relations 
     public function cart()
     {
         return $this->hasOne(Cart::class);
@@ -66,4 +81,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+
+
+
 }

@@ -1,32 +1,60 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { PublicRoute } from './PublicRoute';
+import AuthLayout from './AuthLayout';
+import LoginForm from '../../pages/auth/LoginForm';
+import RegisterForm from '../../pages/auth/RegisterForm';
+import ForgotPasswordPage from '../../pages/auth/ForgotPasswordPage';
+import GoogleCallback from '../../pages/auth/GoogleCallback';
+import { ProtectedRoute } from './ProtectedRoute';
+import DashboardAdmin from './../../pages/admin/DashboardAdmin';
 import AdminLayOut from './AdminLayOut';
 import UserLayOut from './UserLayOut';
-import AuthPage from '../../pages/auth/AuthPage';
-import DashboardUser from '../../pages/user/DashboardUser';
-import DashboardAdmin from '../../pages/admin/DashboardAdmin';
-import { ProtectedRoute } from './ProtectedRoute';
-import { PublicRoute } from './PublicRoute';
+import DashboardUser from './../../pages/user/DashboardUser';
+import ResetPasswordPage from '../../pages/auth/ResetPasswordPage';
+import Products from '../../pages/admin/Products';
+import CategoriesPage from '../../pages/admin/CategoriesPage';
 
 export const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <PublicRoute />,
-    children: [{ index: true, element: <Navigate to="/auth" replace /> }],
-  },
+  // Root — redirect based on auth state
   {
     element: <PublicRoute />,
-    children: [{ path: '/auth', element: <AuthPage /> }],
+    children: [
+      {
+        path: '/auth',
+        element: <AuthLayout />,
+        children: [
+          { index: true, element: <LoginForm /> },
+          { path: 'register', element: <RegisterForm /> },
+          { path: 'forgot-password', element: <ForgotPasswordPage /> },
+          { path: 'reset-password', element: <ResetPasswordPage /> },
+        ],
+      },
+    ],
   },
+
+  // Google OAuth callback — standalone, not guarded
+  {
+    path: '/auth/google/callback',
+    element: <GoogleCallback />,
+  },
+
+  // Admin routes
   {
     element: <ProtectedRoute allowedRoles={['admin']} />,
     children: [
       {
         path: '/admin',
         element: <AdminLayOut />,
-        children: [{ path: 'dashboard', element: <DashboardAdmin /> }],
+        children: [
+          { path: 'dashboard', element: <DashboardAdmin /> },
+          { path: 'products', element: <Products /> },
+          { path: 'categories', element: <CategoriesPage /> },
+        ],
       },
     ],
   },
+
+  // Customer routes
   {
     element: <ProtectedRoute allowedRoles={['customer']} />,
     children: [

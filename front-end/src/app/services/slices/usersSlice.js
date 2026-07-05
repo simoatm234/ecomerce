@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
-import { login, register } from '../thunkFunctions/AuthThunk';
+
 import { me } from '../thunkFunctions/userThunk';
+import { forgotPasswordThunk, login, register, resetPassword } from '../thunkFunctions/AuthThunk';
 
 const initialState = {
   user: null,
@@ -10,6 +11,7 @@ const initialState = {
   isAuthenticated: !!Cookies.get('token'),
   isLoading: false,
   error: null,
+  successMessage: null,
 };
 
 export const usersSlice = createSlice({
@@ -19,12 +21,17 @@ export const usersSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    clearMessages: (state) => {
+      state.error = null;
+      state.successMessage = null;
+    },
     logout: (state) => {
       state.user = null;
       state.token = null;
       state.role = null;
       state.isAuthenticated = false;
       state.error = null;
+      state.successMessage = null;
       Cookies.remove('token', { path: '/' });
       Cookies.remove('role', { path: '/' });
     },
@@ -115,10 +122,40 @@ export const usersSlice = createSlice({
         state.error = action.payload;
         Cookies.remove('token', { path: '/' });
         Cookies.remove('role', { path: '/' });
+      })
+
+      // Forgot Password
+      .addCase(forgotPasswordThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(forgotPasswordThunk.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.successMessage = action.payload.message;
+      })
+      .addCase(forgotPasswordThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      // Reset Password
+      .addCase(resetPassword.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(resetPassword.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.successMessage = action.payload.message;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { logout, clearError } = usersSlice.actions;
+export const { logout, clearError, clearMessages } = usersSlice.actions;
 
 export default usersSlice.reducer;
