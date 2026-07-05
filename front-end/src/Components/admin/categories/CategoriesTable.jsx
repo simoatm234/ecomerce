@@ -2,54 +2,34 @@
 
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 
-const categories = [
-  {
-    id: 1,
-    image: 'https://placehold.co/60x60/E9DDFF/4F378A?text=E',
-    name: 'Electronics',
-    description: 'Phones, laptops, accessories and gadgets.',
-    products: 326,
-    status: 'Active',
-  },
-  {
-    id: 2,
-    image: 'https://placehold.co/60x60/E9DDFF/4F378A?text=F',
-    name: 'Fashion',
-    description: 'Clothing, shoes and accessories.',
-    products: 218,
-    status: 'Active',
-  },
-  {
-    id: 3,
-    image: 'https://placehold.co/60x60/E9DDFF/4F378A?text=H',
-    name: 'Home & Living',
-    description: 'Furniture and home decoration.',
-    products: 154,
-    status: 'Hidden',
-  },
-  {
-    id: 4,
-    image: 'https://placehold.co/60x60/E9DDFF/4F378A?text=S',
-    name: 'Sports',
-    description: 'Fitness and outdoor products.',
-    products: 97,
-    status: 'Active',
-  },
-];
-
-export default function CategoriesTable() {
+export default function CategoriesTable({
+  categories = [],
+  loading,
+  onView,
+  onEdit,
+  onDelete,
+}) {
   const badgeStyle = (status) => {
-    switch (status) {
-      case 'Active':
-        return 'bg-green-100 text-green-700';
-
-      case 'Hidden':
-        return 'bg-yellow-100 text-yellow-700';
-
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
+    return status
+      ? 'bg-green-100 text-green-700'
+      : 'bg-yellow-100 text-yellow-700';
   };
+
+  if (loading) {
+    return (
+      <div className="p-10 text-center text-[#6750A4] font-medium">
+        Loading categories...
+      </div>
+    );
+  }
+
+  if (!categories.length) {
+    return (
+      <div className="p-10 text-center text-[#494551]">
+        No categories found.
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -88,7 +68,11 @@ export default function CategoriesTable() {
               <td className="px-6 py-4">
                 <div className="flex items-center gap-4">
                   <img
-                    src={category.image}
+                    src={
+                      category.image_path
+                        ? `${import.meta.env.VITE_API_URL}/storage/${category.image_path}`
+                        : 'https://placehold.co/60x60/E9DDFF/4F378A?text=C'
+                    }
                     alt={category.name}
                     className="w-14 h-14 rounded-xl object-cover border border-[#cbc4d2]"
                   />
@@ -99,7 +83,7 @@ export default function CategoriesTable() {
                     </h3>
 
                     <p className="text-sm text-[#6b7280]">
-                      CAT-{category.id.toString().padStart(3, '0')}
+                      CAT-{String(category.id).padStart(3, '0')}
                     </p>
                   </div>
                 </div>
@@ -108,14 +92,14 @@ export default function CategoriesTable() {
               {/* Description */}
               <td className="px-6 py-4">
                 <p className="max-w-sm text-sm text-[#494551]">
-                  {category.description}
+                  {category.description || '-'}
                 </p>
               </td>
 
               {/* Products */}
               <td className="px-6 py-4 text-center">
                 <span className="inline-flex items-center justify-center min-w-[60px] rounded-full bg-[#e9ddff] px-3 py-1 text-sm font-semibold text-[#4f378a]">
-                  {category.products}
+                  {category.products_count}
                 </span>
               </td>
 
@@ -123,25 +107,34 @@ export default function CategoriesTable() {
               <td className="px-6 py-4 text-center">
                 <span
                   className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${badgeStyle(
-                    category.status
+                    category.is_active
                   )}`}
                 >
-                  {category.status}
+                  {category.is_active ? 'Active' : 'Hidden'}
                 </span>
               </td>
 
               {/* Actions */}
               <td className="px-6 py-4">
                 <div className="flex justify-center gap-2">
-                  <button className="p-2 rounded-lg hover:bg-[#f3edf7] transition">
+                  <button
+                    onClick={() => onView?.(category)}
+                    className="p-2 rounded-lg hover:bg-[#f3edf7] transition"
+                  >
                     <Eye size={18} className="text-[#6750A4]" />
                   </button>
 
-                  <button className="p-2 rounded-lg hover:bg-[#f3edf7] transition">
+                  <button
+                    onClick={() => onEdit?.(category)}
+                    className="p-2 rounded-lg hover:bg-[#f3edf7] transition"
+                  >
                     <Pencil size={18} className="text-[#6750A4]" />
                   </button>
 
-                  <button className="p-2 rounded-lg hover:bg-red-50 transition">
+                  <button
+                    onClick={() => onDelete?.(category)}
+                    className="p-2 rounded-lg hover:bg-red-50 transition"
+                  >
                     <Trash2 size={18} className="text-red-600" />
                   </button>
                 </div>

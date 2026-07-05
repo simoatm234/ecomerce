@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Storage;
 
 class CategorieService
 {
-    public function getAllCategories()
+    public function getAllCategories(int $perPage = 10)
     {
         return Category::withCount('products')
             ->latest()
-            ->get();
+            ->paginate($perPage);
     }
 
     public function createCategory(array $data): Category

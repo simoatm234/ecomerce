@@ -18,10 +18,12 @@ class CategoriesController extends Controller
     /**
      * Display all categories.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $categories = $this->categorie_service->getAllCategories();
+            $perPage = $request->integer('per_page', 10);
+
+            $categories = $this->categorie_service->getAllCategories($perPage);
 
             return response()->json([
                 'success' => true,

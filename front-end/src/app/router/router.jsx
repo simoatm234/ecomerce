@@ -12,7 +12,8 @@ import UserLayOut from './UserLayOut';
 import DashboardUser from './../../pages/user/DashboardUser';
 import ResetPasswordPage from '../../pages/auth/ResetPasswordPage';
 import Products from '../../pages/admin/Products';
-import CategoriesPage from '../../pages/admin/CategoriesPage';
+import CategoriesPage from '../../pages/admin/Categorie/CategoriesPage';
+import CreateCategorie from '../../pages/admin/Categorie/CreateCategorie';
 
 export const router = createBrowserRouter([
   // Root — redirect based on auth state
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
           { path: 'dashboard', element: <DashboardAdmin /> },
           { path: 'products', element: <Products /> },
           { path: 'categories', element: <CategoriesPage /> },
+          { path: 'categories/create', element: <CreateCategorie /> },
         ],
       },
     ],

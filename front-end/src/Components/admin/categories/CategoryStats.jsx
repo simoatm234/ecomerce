@@ -1,50 +1,64 @@
+// src/components/admin/categories/CategoryStats.jsx
 
 import { Tags, CheckCircle2, EyeOff, Package } from 'lucide-react';
 
-const stats = [
-  {
-    title: 'Total Categories',
-    value: '24',
-    description: 'All product categories',
-    color: 'text-[#4f378a]',
-    bg: 'bg-[#e9ddff]/20',
-    icon: Tags,
-  },
-  {
-    title: 'Active Categories',
-    value: '21',
-    description: 'Visible in the store',
-    color: 'text-green-600',
-    bg: 'bg-green-100',
-    icon: CheckCircle2,
-  },
-  {
-    title: 'Hidden Categories',
-    value: '3',
-    description: 'Not displayed',
-    color: 'text-[#765b00]',
-    bg: 'bg-[#fff4d6]',
-    icon: EyeOff,
-  },
-  {
-    title: 'Products Assigned',
-    value: '1,248',
-    description: 'Across all categories',
-    color: 'text-[#6750A4]',
-    bg: 'bg-[#ede7f6]',
-    icon: Package,
-  },
-];
+export default function CategoryStats({ categories = [] }) {
+  const totalCategories = categories.length;
 
-export default function CategoryStats() {
+  const activeCategories = categories.filter(
+    (category) => category.is_active
+  ).length;
+
+  const hiddenCategories = totalCategories - activeCategories;
+
+  const totalProducts = categories.reduce(
+    (total, category) => total + (category.products_count || 0),
+    0
+  );
+
+  const stats = [
+    {
+      title: 'Total Categories',
+      value: totalCategories,
+      description: 'All product categories',
+      color: 'text-[#4f378a]',
+      bg: 'bg-[#e9ddff]/20',
+      icon: Tags,
+    },
+    {
+      title: 'Active Categories',
+      value: activeCategories,
+      description: 'Visible in the store',
+      color: 'text-green-600',
+      bg: 'bg-green-100',
+      icon: CheckCircle2,
+    },
+    {
+      title: 'Hidden Categories',
+      value: hiddenCategories,
+      description: 'Not displayed',
+      color: 'text-[#765b00]',
+      bg: 'bg-[#fff4d6]',
+      icon: EyeOff,
+    },
+    {
+      title: 'Products Assigned',
+      value: totalProducts.toLocaleString(),
+      description: 'Across all categories',
+      color: 'text-[#6750A4]',
+      bg: 'bg-[#ede7f6]',
+      icon: Package,
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-      {stats.map((item, index) => {
+      {stats.map((item) => {
         const Icon = item.icon;
 
         return (
           <div
-            key={index}
+            key={item.title}
             className="bg-white p-6 rounded-xl border border-[#cbc4d2] hover:shadow-sm transition-all duration-300"
           >
             <div className="flex items-center justify-between mb-3">

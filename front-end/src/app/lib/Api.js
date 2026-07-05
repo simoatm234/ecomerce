@@ -24,4 +24,27 @@ export const api = {
       destroy: (id) => customAxios.delete(`/admin/users/${id}`),
     },
   },
+  categories: {
+    index: (params = {}) =>
+      customAxios.get('/categories', {
+        params,
+      }),
+    show: (id) => customAxios.get(`/categories/${id}`),
+
+    store: (formData) =>
+      customAxios.post('/admin/categories', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
+
+    update: (id, formData) =>
+      customAxios.patch(`/admin/categories/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
+
+    destroy: (id) => customAxios.delete(`/admin/categories/${id}`),
+  },
 };
