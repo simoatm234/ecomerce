@@ -2,7 +2,13 @@ import { createSlice } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
 
 import { me } from '../thunkFunctions/userThunk';
-import { forgotPasswordThunk, login, register, resetPassword } from '../thunkFunctions/AuthThunk';
+import {
+  forgotPasswordThunk,
+  login,
+  logout,
+  register,
+  resetPassword,
+} from '../thunkFunctions/AuthThunk';
 
 const initialState = {
   user: null,
@@ -24,16 +30,6 @@ export const usersSlice = createSlice({
     clearMessages: (state) => {
       state.error = null;
       state.successMessage = null;
-    },
-    logout: (state) => {
-      state.user = null;
-      state.token = null;
-      state.role = null;
-      state.isAuthenticated = false;
-      state.error = null;
-      state.successMessage = null;
-      Cookies.remove('token', { path: '/' });
-      Cookies.remove('role', { path: '/' });
     },
   },
   extraReducers: (builder) => {
@@ -152,10 +148,38 @@ export const usersSlice = createSlice({
       .addCase(resetPassword.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+
+      // Logout
+      .addCase(logout.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.isLoading = false;
+        state.user = null;
+        state.token = null;
+        state.role = null;
+        state.isAuthenticated = false;
+        state.successMessage = null;
+        state.error = null;
+
+        Cookies.remove('token', { path: '/' });
+        Cookies.remove('role', { path: '/' });
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+        state.user = null;
+        state.token = null;
+        state.role = null;
+        state.isAuthenticated = false;
+
+        Cookies.remove('token', { path: '/' });
+        Cookies.remove('role', { path: '/' });
       });
   },
 });
 
-export const { logout, clearError, clearMessages } = usersSlice.actions;
-
+export const { clearError, clearMessages } = usersSlice.actions;
 export default usersSlice.reducer;

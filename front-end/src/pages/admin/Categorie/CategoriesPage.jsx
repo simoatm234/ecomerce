@@ -1,6 +1,4 @@
-// src/pages/admin/CategoriesPage.jsx
-
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import CategoryStats from '../../../Components/admin/categories/CategoryStats';
@@ -8,7 +6,10 @@ import CategoryToolbar from '../../../Components/admin/categories/CategoryToolba
 import CategoriesTable from '../../../Components/admin/categories/CategoriesTable';
 import Pagination from '../../../Components/admin/categories/Pagination';
 
-import { allCategories, deleteCategory } from '../../../app/services/thunkFunctions/CategorieThunk';
+import {
+  allCategories,
+  deleteCategory,
+} from '../../../app/services/thunkFunctions/CategorieThunk';
 import { useNavigate } from 'react-router-dom';
 
 export default function CategoriesPage() {
@@ -19,58 +20,55 @@ export default function CategoriesPage() {
     (state) => state.categorie
   );
 
-  const [filteredCategories, setFilteredCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState(''); // '', '1', '0'
   const [page, setPage] = useState(1);
 
   // ================= Fetch Categories =================
- useEffect(() => {
-   if (!fetched) {
-     dispatch(
-       allCategories({
-         page: 1,
-         per_page: 10,
-       })
-     );
-   }
- }, [fetched]);
-
-  // ================= Sync Local State =================
   useEffect(() => {
-    setFilteredCategories(categories);
-  }, [categories]);
+    if (!fetched) {
+      dispatch(
+        allCategories({
+          page: 1,
+          per_page: 10,
+        })
+      );
+    }
+  }, [fetched]);
+
+  // ================= Derived Filtered List =================
+  // Recomputes automatically whenever categories, searchTerm, OR statusFilter change.
+  // No manual syncing, no stale snapshots.
+  const filteredCategories = useMemo(() => {
+    let result = categories;
+
+    if (searchTerm.trim()) {
+      const keyword = searchTerm.toLowerCase();
+
+      result = result.filter(
+        (category) =>
+          category.name.toLowerCase().includes(keyword) ||
+          category.description?.toLowerCase().includes(keyword)
+      );
+    }
+
+    if (statusFilter !== '') {
+      const isActive = statusFilter === '1';
+
+      result = result.filter((category) => category.is_active === isActive);
+    }
+
+    return result;
+  }, [categories, searchTerm, statusFilter]);
 
   // ================= Search =================
   const handleSearch = (value) => {
-    if (!value.trim()) {
-      setFilteredCategories(categories);
-      return;
-    }
-
-    const keyword = value.toLowerCase();
-
-    const result = categories.filter(
-      (category) =>
-        category.name.toLowerCase().includes(keyword) ||
-        category.description?.toLowerCase().includes(keyword)
-    );
-
-    setFilteredCategories(result);
+    setSearchTerm(value);
   };
 
   // ================= Status Filter =================
   const handleStatusChange = (status) => {
-    if (status === '') {
-      setFilteredCategories(categories);
-      return;
-    }
-
-    const isActive = status === '1';
-
-    const result = categories.filter(
-      (category) => category.is_active === isActive
-    );
-
-    setFilteredCategories(result);
+    setStatusFilter(status);
   };
 
   // ================= Actions =================
@@ -79,26 +77,26 @@ export default function CategoriesPage() {
   };
 
   const handleView = (category) => {
-    console.log('View', category);
+   navigate(`/admin/categories/${category.id}/show`);
   };
 
   const handleEdit = (category) => {
-    console.log('Edit', category);
+    navigate(`/admin/categories/${category.id}/edit`);
   };
 
- const handleDelete = async (category) => {
-   const confirmed = window.confirm(
-     `Are you sure you want to delete "${category.name}"?`
-   );
+  const handleDelete = async (category) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${category.name}"?`
+    );
 
-   if (!confirmed) return;
+    if (!confirmed) return;
 
-   try {
-     await dispatch(deleteCategory(category.id)).unwrap();
-   } catch (error) {
-     console.error(error);
-   }
- };
+    try {
+      await dispatch(deleteCategory(category.id));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">

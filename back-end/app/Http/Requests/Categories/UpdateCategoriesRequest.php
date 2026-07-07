@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Categories;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Category;
 
 class UpdateCategoriesRequest extends FormRequest
 {
@@ -15,18 +16,33 @@ class UpdateCategoriesRequest extends FormRequest
     }
 
     /**
+     * Resolve the category ID regardless of route parameter name
+     * or whether implicit model binding is used.
+     */
+    protected function categoryId(): ?int
+    {
+        $param = $this->route('category') ?? $this->route('id');
+
+        if ($param instanceof Category) {
+            return $param->id;
+        }
+
+        return $param; // raw id (string/int) or null
+    }
+
+    /**
      * Validation rules.
      */
     public function rules(): array
     {
-        $categoryId = $this->route('category')->id;
+        $categoryId = $this->categoryId();
 
         return [
             'name' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
-                "unique:categories,name,$categoryId",
+                "unique:categories,name,{$categoryId},id",
             ],
 
             'description' => [
@@ -56,7 +72,6 @@ class UpdateCategoriesRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Category name is required.',
             'name.unique' => 'A category with this name already exists.',
             'name.max' => 'Category name may not exceed 255 characters.',
 

@@ -39,7 +39,7 @@ export const api = {
       }),
 
     update: (id, formData) =>
-      customAxios.patch(`/admin/categories/${id}`, formData, {
+      customAxios.post(`/admin/categories/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

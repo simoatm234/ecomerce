@@ -28,6 +28,13 @@ export const CategoriesSlice = createSlice({
   initialState,
 
   reducers: {
+    // Finds a category already loaded in `categories` and sets it as
+    // the "current" category — used by UpdateCategoryForm to avoid an
+    // extra API call when the list is already in Redux state.
+    findCategoreyById: (state, action) => {
+      state.category = state.categories.find((d) => d.id == action.payload);
+    },
+
     resetCategory(state) {
       state.category = null;
     },
@@ -155,7 +162,7 @@ export const CategoriesSlice = createSlice({
         state.loading = false;
         const deletedId = action.meta.arg;
         state.categories = state.categories.filter(
-          (category) => category.id !== deletedId
+          (category) => category.id != deletedId
         );
 
         if (state.pagination.total > 0) {
@@ -174,4 +181,7 @@ export const CategoriesSlice = createSlice({
   },
 });
 
-export const { resetCategory, resetCategories } = CategoriesSlice.actions;
+export const { findCategoreyById, resetCategory, resetCategories } =
+  CategoriesSlice.actions;
+
+export default CategoriesSlice.reducer;

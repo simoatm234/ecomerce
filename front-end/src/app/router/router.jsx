@@ -14,6 +14,8 @@ import ResetPasswordPage from '../../pages/auth/ResetPasswordPage';
 import Products from '../../pages/admin/Products';
 import CategoriesPage from '../../pages/admin/Categorie/CategoriesPage';
 import CreateCategorie from '../../pages/admin/Categorie/CreateCategorie';
+import UpdateCategories from '../../pages/admin/Categorie/UpdateCategories';
+import ShowCategorie from '../../pages/admin/Categorie/ShowCategorie';
 
 export const router = createBrowserRouter([
   // Root — redirect based on auth state
@@ -51,6 +53,8 @@ export const router = createBrowserRouter([
           { path: 'products', element: <Products /> },
           { path: 'categories', element: <CategoriesPage /> },
           { path: 'categories/create', element: <CreateCategorie /> },
+          { path: 'categories/:id/edit', element: <UpdateCategories /> },
+          { path: 'categories/:id/show', element: <ShowCategorie /> },
         ],
       },
     ],

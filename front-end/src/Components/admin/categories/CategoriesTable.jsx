@@ -1,6 +1,7 @@
 // src/components/admin/categories/CategoriesTable.jsx
 
 import { Eye, Pencil, Trash2 } from 'lucide-react';
+import ShowImage from '../../ShowImage';
 
 export default function CategoriesTable({
   categories = [],
@@ -67,14 +68,10 @@ export default function CategoriesTable({
               {/* Category */}
               <td className="px-6 py-4">
                 <div className="flex items-center gap-4">
-                  <img
-                    src={
-                      category.image_path
-                        ? `${import.meta.env.VITE_API_URL}/storage/${category.image_path}`
-                        : 'https://placehold.co/60x60/E9DDFF/4F378A?text=C'
-                    }
+                  <ShowImage
+                    url={category.image_path}
                     alt={category.name}
-                    className="w-14 h-14 rounded-xl object-cover border border-[#cbc4d2]"
+                    className="w-14 h-14 shrink-0"
                   />
 
                   <div>

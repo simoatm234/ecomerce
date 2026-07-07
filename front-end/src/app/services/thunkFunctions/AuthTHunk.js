@@ -56,3 +56,16 @@ export const resetPassword = createAsyncThunk(
     }
   }
 );
+export const logout = createAsyncThunk(
+  'auth/logout',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.auth.logout();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to reset password.'
+      );
+    }
+  }
+);
