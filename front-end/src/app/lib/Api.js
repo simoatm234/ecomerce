@@ -18,9 +18,15 @@ export const api = {
   },
   admin: {
     users: {
-      index: () => customAxios.get('/admin/users'),
+      index: (params = {}) => customAxios.get('/admin/users', { params }),
+
+      show: (id) => customAxios.get(`/admin/users/${id}`),
+
       store: (data) => customAxios.post('/admin/users', data),
-      update: (id, data) => customAxios.patch(`/admin/users/${id}`, data),
+
+      update: ({ id, formData }) =>
+        customAxios.put(`/admin/users/${id}`, formData),
+
       destroy: (id) => customAxios.delete(`/admin/users/${id}`),
     },
   },

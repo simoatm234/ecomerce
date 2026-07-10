@@ -3,22 +3,21 @@
 namespace App\Services;
 
 use App\Models\User;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
-    public function list(array $filters = []): LengthAwarePaginator
+    public function list(array $filters = [])
     {
-        return User::query()
-            ->when($filters['search'] ?? null, function ($query, string $search): void {
-                $query->where(function ($query) use ($search): void {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->when($filters['role'] ?? null, fn ($query, string $role) => $query->where('role', $role))
-            ->latest()
-            ->paginate($filters['per_page'] ?? 15);
+        $query = User::query();
+
+        if (!empty($filters['role'])) {
+            $query->where('role', $filters['role']);
+        }
+
+        $perPage = $filters['per_page'] ?? 10;
+
+        return $query->paginate($perPage);
     }
 
     public function create(array $data): User
@@ -26,7 +25,7 @@ class UserService
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => $data['password'],
+            'password' => Hash::make($data['password']), // ✅ hashed
             'role' => $data['role'],
             'phone' => $data['phone'] ?? null,
             'address' => $data['address'] ?? null,
@@ -35,13 +34,20 @@ class UserService
 
     public function update(User $user, array $data): User
     {
-        if (! empty($data['password'])) {
-            $user->password = $data['password'];
+        // Google users cannot change email or password
+        if ($user->google_id) {
+            unset($data['email']);
+            unset($data['password']);
         }
 
-        $user->fill(collect($data)->except(['password'])->all());
+        // Hash password if provided
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
 
-        $user->save();
+        $user->update($data);
 
         return $user->fresh();
     }

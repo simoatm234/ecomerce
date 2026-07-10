@@ -16,6 +16,9 @@ import CategoriesPage from '../../pages/admin/Categorie/CategoriesPage';
 import CreateCategorie from '../../pages/admin/Categorie/CreateCategorie';
 import UpdateCategories from '../../pages/admin/Categorie/UpdateCategories';
 import ShowCategorie from '../../pages/admin/Categorie/ShowCategorie';
+import AllUsers from '../../pages/admin/users/AllUsers';
+import ShowUser from '../../pages/admin/users/ShowUser';
+import UpdateUser from '../../pages/admin/users/UpdateUser';
 
 export const router = createBrowserRouter([
   // Root — redirect based on auth state
@@ -55,6 +58,9 @@ export const router = createBrowserRouter([
           { path: 'categories/create', element: <CreateCategorie /> },
           { path: 'categories/:id/edit', element: <UpdateCategories /> },
           { path: 'categories/:id/show', element: <ShowCategorie /> },
+          { path: 'users', element: <AllUsers /> },
+          { path: 'users/:id', element: <ShowUser /> },
+          { path: 'users/:id/edit', element: <UpdateUser /> },
         ],
       },
     ],

@@ -1,3 +1,5 @@
+// src/Components/admin/users/ShowUser.jsx
+
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -5,59 +7,69 @@ import {
   ArrowLeft,
   Pencil,
   AlertCircle,
-  FileText,
+  Mail,
+  Phone,
+  MapPin,
+  ShieldCheck,
   CalendarClock,
-  CheckCircle2,
-  XCircle,
+  BadgeCheck,
+  BadgeAlert,
 } from 'lucide-react';
 
-import { showCategory } from '../../../app/services/thunkFunctions/CategorieThunk';
-import { findCategoreyById } from '../../../app/services/slices/CategoriesSlice';
-import ShowImage from '../../../Components/ShowImage';
+import { findUserById } from '../../../app/services/slices/usersSlice';
+import { showUser } from '../../../app/services/thunkFunctions/userThunk';
 
-export default function ShowCategorie() {
+export default function ShowUser() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { categories, category } = useSelector((state) => state.categorie);
+  const { users, user } = useSelector((state) => state.users);
 
   const [loading, setLoading] = useState(true);
   const [alertError, setAlertError] = useState(null);
 
   useEffect(() => {
-    const existsInList = categories.some((c) => c.id == id);
+    const existsInList = users.some((u) => u.id == id);
 
     if (existsInList) {
-      dispatch(findCategoreyById(id));
+      dispatch(findUserById(id));
       setLoading(false);
       return;
     }
 
-    const loadCategory = async () => {
+    const loadUser = async () => {
       setLoading(true);
 
       try {
-        await dispatch(showCategory(id)).unwrap();
+        await dispatch(showUser(id)).unwrap();
       } catch (error) {
         console.error(error);
         setAlertError(
-          error?.message || 'Failed to load category. Please try again.'
+          error?.message || 'Failed to load user. Please try again.'
         );
       } finally {
         setLoading(false);
       }
     };
 
-    loadCategory();
+    loadUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, categories]);
+  }, [id, users]);
+
+  const initials = (name = '') =>
+    name
+      .split(' ')
+      .map((part) => part[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
 
   if (loading) {
     return (
       <div className="p-6">
         <div className="bg-white rounded-xl border border-[#cbc4d2] p-8 text-center text-[#494551]">
-          Loading category...
+          Loading user...
         </div>
       </div>
     );
@@ -72,114 +84,132 @@ export default function ShowCategorie() {
         </div>
 
         <Link
-          to="/admin/categories"
+          to="/admin/users"
           className="inline-flex items-center gap-2 mt-4 text-[#6750A4] hover:underline"
         >
           <ArrowLeft size={16} />
-          Back to categories
+          Back to users
         </Link>
       </div>
     );
   }
 
-  if (!category) {
+  if (!user) {
     return (
       <div className="p-6">
         <div className="bg-white rounded-xl border border-[#cbc4d2] p-8 text-center text-[#494551]">
-          Category not found.
+          User not found.
         </div>
 
         <Link
-          to="/admin/categories"
+          to="/admin/users"
           className="inline-flex items-center gap-2 mt-4 text-[#6750A4] hover:underline"
         >
           <ArrowLeft size={16} />
-          Back to categories
+          Back to users
         </Link>
       </div>
     );
   }
 
-  const isActive = !!category.is_active;
+  const isAdmin = user.role === 'admin';
+  const isVerified = !!user.email_verified_at;
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       {/* Back link */}
       <Link
-        to="/admin/categories"
+        to="/admin/users"
         className="inline-flex items-center gap-2 text-sm text-[#6750A4] hover:underline"
       >
         <ArrowLeft size={16} />
-        Back to categories
+        Back to users
       </Link>
 
       {/* Header card */}
       <div className="bg-white rounded-2xl border border-[#cbc4d2] p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-5">
-            <ShowImage
-              url={category.image_path}
-              alt={category.name}
-              className="w-20 h-20 shrink-0 rounded-2xl"
-            />
+            <div className="w-20 h-20 shrink-0 rounded-full bg-gradient-to-br from-[#e9ddff] to-[#d8c7ff] flex items-center justify-center text-2xl font-bold text-[#4f378a]">
+              {initials(user.name)}
+            </div>
 
             <div>
-              <h1 className="text-2xl font-bold text-[#1d1b20]">
-                {category.name}
-              </h1>
+              <h1 className="text-2xl font-bold text-[#1d1b20]">{user.name}</h1>
 
               <p className="text-sm text-[#6b7280] mt-0.5">
-                CAT-{String(category.id).padStart(3, '0')}
+                USR-{String(user.id).padStart(3, '0')}
               </p>
 
               <div className="flex flex-wrap items-center gap-2 mt-3">
                 <span
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
-                    isActive
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-red-100 text-red-700'
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold capitalize ${
+                    isAdmin
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-[#e9ddff] text-[#4f378a]'
                   }`}
                 >
-                  {isActive ? (
-                    <CheckCircle2 size={13} />
-                  ) : (
-                    <XCircle size={13} />
-                  )}
-                  {isActive ? 'Active' : 'Inactive'}
+                  <ShieldCheck size={13} />
+                  {user.role}
                 </span>
+
               </div>
             </div>
           </div>
 
           <button
-            onClick={() => navigate(`/admin/categories/${category.id}/edit`)}
+            onClick={() => navigate(`/admin/users/${user.id}/edit`)}
             className="flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#6750A4] text-white hover:bg-[#4f378a] transition shrink-0"
           >
             <Pencil size={18} />
-            Edit Category
+            Edit User
           </button>
         </div>
       </div>
 
-      {/* Details card */}
+      {/* Contact info card */}
       <div className="bg-white rounded-2xl border border-[#cbc4d2] p-8">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-[#494551] mb-5">
-          Details
+          Contact Information
         </h2>
 
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 shrink-0 rounded-lg bg-[#f3edf7] flex items-center justify-center">
-            <FileText size={18} className="text-[#6750A4]" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 shrink-0 rounded-lg bg-[#f3edf7] flex items-center justify-center">
+              <Mail size={18} className="text-[#6750A4]" />
+            </div>
+            <div>
+              <p className="text-xs text-[#6b7280] mb-0.5">Email Address</p>
+              <p className="text-sm font-medium text-[#1a1a1a]">{user.email}</p>
+            </div>
           </div>
-          <div className="flex-1">
-            <p className="text-xs text-[#6b7280] mb-0.5">Description</p>
-            <p className="text-sm font-medium text-[#1a1a1a] whitespace-pre-wrap">
-              {category.description || (
-                <span className="italic text-[#9ca3af]">
-                  No description provided.
-                </span>
-              )}
-            </p>
+
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 shrink-0 rounded-lg bg-[#f3edf7] flex items-center justify-center">
+              <Phone size={18} className="text-[#6750A4]" />
+            </div>
+            <div>
+              <p className="text-xs text-[#6b7280] mb-0.5">Phone Number</p>
+              <p className="text-sm font-medium text-[#1a1a1a]">
+                {user.phone || (
+                  <span className="italic text-[#9ca3af]">Not provided</span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 sm:col-span-2">
+            <div className="w-10 h-10 shrink-0 rounded-lg bg-[#f3edf7] flex items-center justify-center">
+              <MapPin size={18} className="text-[#6750A4]" />
+            </div>
+            <div>
+              <p className="text-xs text-[#6b7280] mb-0.5">Address</p>
+              <p className="text-sm font-medium text-[#1a1a1a] whitespace-pre-wrap">
+                {user.address || (
+                  <span className="italic text-[#9ca3af]">Not provided</span>
+                )}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -187,7 +217,7 @@ export default function ShowCategorie() {
       {/* Account info card */}
       <div className="bg-white rounded-2xl border border-[#cbc4d2] p-8">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-[#494551] mb-5">
-          Record Information
+          Account Information
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -196,10 +226,10 @@ export default function ShowCategorie() {
               <CalendarClock size={18} className="text-[#6750A4]" />
             </div>
             <div>
-              <p className="text-xs text-[#6b7280] mb-0.5">Created At</p>
+              <p className="text-xs text-[#6b7280] mb-0.5">Joined At</p>
               <p className="text-sm font-medium text-[#1a1a1a]">
-                {category.created_at
-                  ? new Date(category.created_at).toLocaleString()
+                {user.created_at
+                  ? new Date(user.created_at).toLocaleString()
                   : '—'}
               </p>
             </div>
@@ -212,8 +242,8 @@ export default function ShowCategorie() {
             <div>
               <p className="text-xs text-[#6b7280] mb-0.5">Last Updated</p>
               <p className="text-sm font-medium text-[#1a1a1a]">
-                {category.updated_at
-                  ? new Date(category.updated_at).toLocaleString()
+                {user.updated_at
+                  ? new Date(user.updated_at).toLocaleString()
                   : '—'}
               </p>
             </div>

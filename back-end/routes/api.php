@@ -53,12 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('admin')->prefix('admin')->group(function () {
 
-        Route::apiResource('users', UserController::class)->only([
-            'index',
-            'store',
-            'update',
-            'destroy',
-        ]);
+        Route::apiResource('users', UserController::class);
 
         Route::apiResource('categories', CategoriesController::class)->except([
             'index',

@@ -19,13 +19,15 @@ class UserController extends Controller
     {
         try {
             $filters = $request->validate([
-                'search' => ['nullable', 'string', 'max:255'],
                 'role' => ['nullable', 'in:customer,admin'],
                 'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             ]);
 
+            $users = $this->userService->list($filters);
+
             return response()->json([
-                'users' => $this->userService->list($filters),
+                'success' => true,
+                'data' => $users,
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -73,22 +75,43 @@ class UserController extends Controller
             ], 500);
         }
     }
+    public function show(User $user): JsonResponse
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'data' => $user,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch user.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
     public function update(Request $request, User $user): JsonResponse
     {
         try {
             $data = $request->validate([
                 'name' => ['sometimes', 'string', 'max:255'],
-                'email' => ['sometimes', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+                'email' => [
+                    'sometimes',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email')->ignore($user->id),
+                ],
                 'password' => ['sometimes', 'nullable', 'string', 'min:8'],
                 'role' => ['sometimes', 'in:customer,admin'],
                 'phone' => ['nullable', 'string', 'max:30'],
                 'address' => ['nullable', 'string', 'max:1000'],
             ]);
 
+            $updatedUser = $this->userService->update($user, $data);
+
             return response()->json([
                 'message' => 'User updated successfully.',
-                'user' => $this->userService->update($user, $data),
+                'data' => $updatedUser,
             ]);
         } catch (ValidationException $e) {
             return response()->json([

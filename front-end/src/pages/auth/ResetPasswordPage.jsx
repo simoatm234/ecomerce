@@ -22,7 +22,7 @@ export default function ResetPasswordPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoading, error, successMessage } = useSelector(
-    (state) => state.users
+    (state) => state.auth
   );
 
   const token = searchParams.get('token');

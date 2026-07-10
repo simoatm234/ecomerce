@@ -42,7 +42,7 @@ export default function AuthPage() {
   const [activeTab, setActiveTab] = useState('login');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoading, error } = useSelector((state) => state.users);
+  const { isLoading, error } = useSelector((state) => state.auth);
 
   // Login form
   const {

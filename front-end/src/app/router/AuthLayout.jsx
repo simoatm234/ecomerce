@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { api } from '../lib/Api';
 
 export default function AuthLayout() {
-  const { error } = useSelector((state) => state.users);
+  const { error } = useSelector((state) => state.auth);
   const location = useLocation();
 
   const isLoginOrRegister =

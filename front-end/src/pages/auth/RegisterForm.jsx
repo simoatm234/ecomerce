@@ -30,7 +30,7 @@ const registerSchema = z.object({
 export default function RegisterForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoading } = useSelector((state) => state.users);
+  const { isLoading } = useSelector((state) => state.auth);
 
   const {
     register,

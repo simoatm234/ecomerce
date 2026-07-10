@@ -14,7 +14,7 @@ const forgotPasswordSchema = z.object({
 export default function ForgotPasswordPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoading, successMessage } = useSelector((state) => state.users);
+  const { isLoading, successMessage } = useSelector((state) => state.auth);
 
   const {
     register,

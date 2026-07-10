@@ -51,7 +51,7 @@ const menus = [
   },
 ];
 
-export default function Sidebar({ open, setOpen }) {
+export default function Sidebar({ open, setOpen, user }) {
   return (
     <>
       {/* Overlay */}
@@ -87,10 +87,10 @@ export default function Sidebar({ open, setOpen }) {
             </div>
 
             <div>
-              <p className="text-sm font-bold text-[#1d1b20]">Store Manager</p>
+              <p className="text-sm font-bold text-[#1d1b20]">{user.name}</p>
 
               <p className="text-[10px] uppercase tracking-wider text-[#494551]">
-                admin@store.com
+               {user.email}
               </p>
             </div>
           </div>

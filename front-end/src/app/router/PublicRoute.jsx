@@ -3,7 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 export function PublicRoute() {
   const { isAuthenticated, role, isLoading } = useSelector(
-    (state) => state.users
+    (state) => state.auth
   );
 
   if (isLoading) {
