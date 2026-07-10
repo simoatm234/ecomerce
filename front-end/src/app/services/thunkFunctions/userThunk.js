@@ -20,7 +20,6 @@ export const allUsers = createAsyncThunk(
   async ({ page = 1, per_page = 10 } = {}, { rejectWithValue }) => {
     try {
       const res = await api.admin.users.index({ page, per_page });
-      console.log(res);
       return res.data;
     } catch (error) {
       return rejectWithValue(
@@ -34,7 +33,7 @@ export const showUser = createAsyncThunk(
   'users/showUser',
   async (id, { rejectWithValue }) => {
     try {
-      const res = await api.admin.users.show(id); // ✅ fixed — was api.users.show
+      const res = await api.admin.users.show(id);
       return res.data;
     } catch (error) {
       return rejectWithValue(
@@ -48,8 +47,7 @@ export const updateUser = createAsyncThunk(
   'users/updateUser',
   async ({ id, formData }, { rejectWithValue }) => {
     try {
-      const res = await api.admin.users.update({id, formData});
-      console.log(res);
+      const res = await api.admin.users.update({ id, formData });
       return res.data;
     } catch (error) {
       return rejectWithValue(

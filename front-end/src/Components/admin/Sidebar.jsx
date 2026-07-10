@@ -87,10 +87,10 @@ export default function Sidebar({ open, setOpen, user }) {
             </div>
 
             <div>
-              <p className="text-sm font-bold text-[#1d1b20]">{user.name}</p>
+              <p className="text-sm font-bold text-[#1d1b20]">{user?.name}</p>
 
               <p className="text-[10px] uppercase tracking-wider text-[#494551]">
-               {user.email}
+               {user?.email}
               </p>
             </div>
           </div>

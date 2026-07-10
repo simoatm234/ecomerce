@@ -84,11 +84,15 @@ export default function AllUsers() {
   };
 
   // ================= Role Filter =================
+
   const handleRoleChange = (role) => {
     setRoleFilter(role);
   };
 
   // ================= Actions =================
+  const onAddUser = () => {
+     navigate(`/admin/users/create`);
+  };
   const handleView = (user) => {
     navigate(`/admin/users/${user.id}`);
   };
@@ -118,7 +122,7 @@ export default function AllUsers() {
       <div className="bg-white rounded-xl border border-[#cbc4d2] shadow-sm overflow-hidden">
         <UserToolbar
           onSearch={handleSearch}
-          
+          onAddUser={onAddUser}
           onRoleChange={handleRoleChange}
         />
 

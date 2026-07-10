@@ -1,11 +1,8 @@
 // src/components/admin/users/UserToolbar.jsx
 
-import { Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 
-export default function UserToolbar({
-  onSearch,
-  onRoleChange,
-}) {
+export default function UserToolbar({ onSearch, onRoleChange, onAddUser }) {
   return (
     <div className="bg-white border-b border-[#cbc4d2] p-5">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -26,8 +23,6 @@ export default function UserToolbar({
             />
           </div>
 
-          
-
           {/* Role */}
           <select
             onChange={(e) => onRoleChange?.(e.target.value)}
@@ -38,6 +33,13 @@ export default function UserToolbar({
             <option value="admin">Admin</option>
             <option value="customer">Customer</option>
           </select>
+          <button
+            onClick={onAddUser}
+            className="flex items-center justify-center gap-2 h-11 px-5 rounded-lg bg-[#6750A4] text-white hover:bg-[#4f378a] transition"
+          >
+            <Plus size={18} />
+            Add Category
+          </button>
         </div>
       </div>
     </div>
