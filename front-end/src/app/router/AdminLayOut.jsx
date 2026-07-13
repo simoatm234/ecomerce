@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 
 export default function AdminLayOut() {
   const [open, setOpen] = useState(false);
-  const { user } = useSelector((state) => state.users);
+  const { user } = useSelector((state) => state.auth);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">

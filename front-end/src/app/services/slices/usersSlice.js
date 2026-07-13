@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
   allUsers,
+  createUser,
   deleteUser,
   showUser,
   updateUser,
@@ -79,6 +80,32 @@ export const usersSlice = createSlice({
       })
 
       .addCase(allUsers.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      // ======================
+      // create
+      // ======================
+      .addCase(createUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+
+        const created = action.payload.data ?? action.payload.user;
+
+        state.users.unshift(created);
+
+        if (state.pagination) {
+          state.pagination.total += 1;
+        }
+
+        state.successMessage = 'User created successfully.';
+      })
+
+      .addCase(createUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })

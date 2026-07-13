@@ -1,5 +1,6 @@
 // src/components/admin/users/UsersTable.jsx
 
+import { useSelector } from 'react-redux';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 
 export default function UsersTable({
@@ -9,16 +10,13 @@ export default function UsersTable({
   onEdit,
   onDelete,
 }) {
+  // Adjust this selector path to match your actual auth slice/state shape
+  const currentUserId = useSelector((state) => state.auth?.user?.id);
+
   const roleStyle = (role) => {
     return role === 'admin'
       ? 'bg-blue-100 text-blue-700'
       : 'bg-[#e9ddff] text-[#4f378a]';
-  };
-
-  const verifiedStyle = (verifiedAt) => {
-    return verifiedAt
-      ? 'bg-green-100 text-green-700'
-      : 'bg-yellow-100 text-yellow-700';
   };
 
   const initials = (name = '') =>
@@ -71,78 +69,93 @@ export default function UsersTable({
         </thead>
 
         <tbody>
-          {users.map((user) => (
-            <tr
-              key={user.id}
-              className="border-b border-[#ebe6ef] hover:bg-[#faf7fc] transition"
-            >
-              {/* User */}
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 shrink-0 rounded-full bg-[#e9ddff] flex items-center justify-center font-semibold text-[#4f378a]">
-                    {initials(user.name)}
+          {users.map((user) => {
+            const isSelf = currentUserId != null && user.id == currentUserId;
+
+            return (
+              <tr
+                key={user.id}
+                className="border-b border-[#ebe6ef] hover:bg-[#faf7fc] transition"
+              >
+                {/* User */}
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 shrink-0 rounded-full bg-[#e9ddff] flex items-center justify-center font-semibold text-[#4f378a]">
+                      {initials(user.name)}
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold text-[#1d1b20] flex items-center gap-2">
+                        {user.name}
+                        {isSelf && (
+                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#e9ddff] text-[#4f378a]">
+                            You
+                          </span>
+                        )}
+                      </h3>
+
+                      <p className="text-sm text-[#6b7280]">
+                        USR-{String(user.id).padStart(3, '0')}
+                      </p>
+                    </div>
                   </div>
+                </td>
 
-                  <div>
-                    <h3 className="font-semibold text-[#1d1b20]">
-                      {user.name}
-                    </h3>
+                {/* Email */}
+                <td className="px-6 py-4">
+                  <p className="max-w-sm text-sm text-[#494551]">
+                    {user.email}
+                  </p>
+                </td>
 
-                    <p className="text-sm text-[#6b7280]">
-                      USR-{String(user.id).padStart(3, '0')}
-                    </p>
+                {/* Phone */}
+                <td className="px-6 py-4">
+                  <p className="text-sm text-[#494551]">{user.phone || '-'}</p>
+                </td>
+
+                {/* Role */}
+                <td className="px-6 py-4 text-center">
+                  <span
+                    className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${roleStyle(
+                      user.role
+                    )}`}
+                  >
+                    {user.role}
+                  </span>
+                </td>
+
+                {/* Actions */}
+                <td className="px-6 py-4">
+                  <div className="flex justify-center gap-2">
+                    <button
+                      onClick={() => onView?.(user)}
+                      className="p-2 rounded-lg hover:bg-[#f3edf7] transition"
+                    >
+                      <Eye size={18} className="text-[#6750A4]" />
+                    </button>
+
+                    {!isSelf && (
+                      <>
+                        <button
+                          onClick={() => onEdit?.(user)}
+                          className="p-2 rounded-lg hover:bg-[#f3edf7] transition"
+                        >
+                          <Pencil size={18} className="text-[#6750A4]" />
+                        </button>
+
+                        <button
+                          onClick={() => onDelete?.(user)}
+                          className="p-2 rounded-lg hover:bg-red-50 transition"
+                        >
+                          <Trash2 size={18} className="text-red-600" />
+                        </button>
+                      </>
+                    )}
                   </div>
-                </div>
-              </td>
-
-              {/* Email */}
-              <td className="px-6 py-4">
-                <p className="max-w-sm text-sm text-[#494551]">{user.email}</p>
-              </td>
-
-              {/* Phone */}
-              <td className="px-6 py-4">
-                <p className="text-sm text-[#494551]">{user.phone || '-'}</p>
-              </td>
-
-              {/* Role */}
-              <td className="px-6 py-4 text-center">
-                <span
-                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${roleStyle(
-                    user.role
-                  )}`}
-                >
-                  {user.role}
-                </span>
-              </td>
-
-              {/* Actions */}
-              <td className="px-6 py-4">
-                <div className="flex justify-center gap-2">
-                  <button
-                    onClick={() => onView?.(user)}
-                    className="p-2 rounded-lg hover:bg-[#f3edf7] transition"
-                  >
-                    <Eye size={18} className="text-[#6750A4]" />
-                  </button>
-
-                  <button
-                    onClick={() => onEdit?.(user)}
-                    className="p-2 rounded-lg hover:bg-[#f3edf7] transition"
-                  >
-                    <Pencil size={18} className="text-[#6750A4]" />
-                  </button>
-
-                  <button
-                    onClick={() => onDelete?.(user)}
-                    className="p-2 rounded-lg hover:bg-red-50 transition"
-                  >
-                    <Trash2 size={18} className="text-red-600" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

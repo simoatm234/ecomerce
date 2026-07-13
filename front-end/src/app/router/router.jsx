@@ -11,7 +11,7 @@ import AdminLayOut from './AdminLayOut';
 import UserLayOut from './UserLayOut';
 import DashboardUser from './../../pages/user/DashboardUser';
 import ResetPasswordPage from '../../pages/auth/ResetPasswordPage';
-import Products from '../../pages/admin/Products';
+import Products from '../../pages/admin/Product/Products';
 import CategoriesPage from '../../pages/admin/Categorie/CategoriesPage';
 import CreateCategorie from '../../pages/admin/Categorie/CreateCategorie';
 import UpdateCategories from '../../pages/admin/Categorie/UpdateCategories';
@@ -20,6 +20,7 @@ import AllUsers from '../../pages/admin/users/AllUsers';
 import ShowUser from '../../pages/admin/users/ShowUser';
 import UpdateUser from '../../pages/admin/users/UpdateUser';
 import CreateUser from '../../pages/admin/users/CreateUser';
+import CreateProduct from '../../pages/admin/Product/CreateProduct';
 
 export const router = createBrowserRouter([
   // Root — redirect based on auth state
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
         children: [
           { path: 'dashboard', element: <DashboardAdmin /> },
           { path: 'products', element: <Products /> },
+          { path: 'products/create', element: <CreateProduct /> },
           { path: 'categories', element: <CategoriesPage /> },
           { path: 'categories/create', element: <CreateCategorie /> },
           { path: 'categories/:id/edit', element: <UpdateCategories /> },

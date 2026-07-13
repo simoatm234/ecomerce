@@ -2,50 +2,64 @@
 
 import { Package, CheckCircle2, TriangleAlert, PackageX } from 'lucide-react';
 
-const stats = [
-  {
-    title: 'Total Products',
-    value: '1,248',
-    description: 'Across all categories',
-    color: 'text-[#4f378a]',
-    bg: 'bg-[#e9ddff]/20',
-    icon: Package,
-  },
-  {
-    title: 'Active Products',
-    value: '1,182',
-    description: 'Currently available',
-    color: 'text-green-600',
-    bg: 'bg-green-100',
-    icon: CheckCircle2,
-  },
-  {
-    title: 'Low Stock',
-    value: '42',
-    description: 'Need restocking',
-    color: 'text-[#765b00]',
-    bg: 'bg-[#fff4d6]',
-    icon: TriangleAlert,
-  },
-  {
-    title: 'Out of Stock',
-    value: '24',
-    description: 'Unavailable',
-    color: 'text-red-600',
-    bg: 'bg-red-100',
-    icon: PackageX,
-  },
-];
+const LOW_STOCK_THRESHOLD = 10;
 
-export default function ProductStats() {
+export default function ProductStats({ products = [] }) {
+  const totalProducts = products.length;
+
+  const activeProducts = products.filter((product) => product.is_active).length;
+
+  const lowStockProducts = products.filter(
+    (product) => product.stock > 0 && product.stock <= LOW_STOCK_THRESHOLD
+  ).length;
+
+  const outOfStockProducts = products.filter(
+    (product) => product.stock === 0
+  ).length;
+
+  const stats = [
+    {
+      title: 'Total Products',
+      value: totalProducts,
+      description: 'Across all categories',
+      color: 'text-[#4f378a]',
+      bg: 'bg-[#e9ddff]/20',
+      icon: Package,
+    },
+    {
+      title: 'Active Products',
+      value: activeProducts,
+      description: 'Currently available',
+      color: 'text-green-600',
+      bg: 'bg-green-100',
+      icon: CheckCircle2,
+    },
+    {
+      title: 'Low Stock',
+      value: lowStockProducts,
+      description: `${LOW_STOCK_THRESHOLD} units or fewer`,
+      color: 'text-[#765b00]',
+      bg: 'bg-[#fff4d6]',
+      icon: TriangleAlert,
+    },
+    {
+      title: 'Out of Stock',
+      value: outOfStockProducts,
+      description: 'Unavailable',
+      color: 'text-red-600',
+      bg: 'bg-red-100',
+      icon: PackageX,
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-      {stats.map((item, index) => {
+      {stats.map((item) => {
         const Icon = item.icon;
 
         return (
           <div
-            key={index}
+            key={item.title}
             className="bg-white p-6 rounded-xl border border-[#cbc4d2] hover:shadow-sm transition-all duration-300"
           >
             <div className="flex items-center justify-between mb-3">

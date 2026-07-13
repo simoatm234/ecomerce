@@ -16,19 +16,18 @@ export const api = {
     update: (data) => customAxios.patch('/profile', data),
     destroy: () => customAxios.delete('/profile'),
   },
-  admin: {
-    users: {
-      index: (params = {}) => customAxios.get('/admin/users', { params }),
 
-      show: (id) => customAxios.get(`/admin/users/${id}`),
+  users: {
+    index: (params = {}) => customAxios.get('/admin/users', { params }),
 
-      store: (data) => customAxios.post('/admin/users', data),
+    show: (id) => customAxios.get(`/admin/users/${id}`),
 
-      update: ({ id, formData }) =>
-        customAxios.put(`/admin/users/${id}`, formData),
+    store: (data) => customAxios.post('/admin/users', data),
 
-      destroy: (id) => customAxios.delete(`/admin/users/${id}`),
-    },
+    update: ({ id, formData }) =>
+      customAxios.put(`/admin/users/${id}`, formData),
+
+    destroy: (id) => customAxios.delete(`/admin/users/${id}`),
   },
   categories: {
     index: (params = {}) =>
@@ -52,5 +51,26 @@ export const api = {
       }),
 
     destroy: (id) => customAxios.delete(`/admin/categories/${id}`),
+  },
+
+  products: {
+    index: (params = {}) =>
+      customAxios.get('/products', {
+        params,
+      }),
+    show: (id) => customAxios.get(`/products/${id}`),
+    store: (formData) =>
+      customAxios.post('/admin/products', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
+    update: (id, formData) =>
+      customAxios.post(`/admin/products/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
+    destroy: (id) => customAxios.delete(`/admin/products/${id}`),
   },
 };

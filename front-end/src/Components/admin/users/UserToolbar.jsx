@@ -38,7 +38,7 @@ export default function UserToolbar({ onSearch, onRoleChange, onAddUser }) {
             className="flex items-center justify-center gap-2 h-11 px-5 rounded-lg bg-[#6750A4] text-white hover:bg-[#4f378a] transition"
           >
             <Plus size={18} />
-            Add Category
+            Add User
           </button>
         </div>
       </div>

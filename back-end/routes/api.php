@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,10 @@ Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallbac
 Route::get('/categories', [CategoriesController::class, 'index']);
 Route::get('/categories/{category}', [CategoriesController::class, 'show']);
 
+// Products are visible to everyone
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{product}', [ProductController::class, 'show']);
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated
@@ -56,6 +61,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('users', UserController::class);
 
         Route::apiResource('categories', CategoriesController::class)->except([
+            'index',
+            'show',
+        ]);
+
+        Route::apiResource('products', ProductController::class)->except([
             'index',
             'show',
         ]);
